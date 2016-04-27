@@ -1,4 +1,10 @@
-var Timerange = function(){}
+/*
+  Timerange.js
+  Author: Akira Laine
+  Created On: 27/04/2016
+*/
+
+var Timerange = new Function();
 
 Timerange.prototype.timeFrom = function(date, type){
   if(date instanceof Date){
@@ -24,24 +30,26 @@ Timerange.prototype.timeFrom = function(date, type){
           var minutesFromTargetMinute = date.getMinutes() === new Date().getMinutes() ? 0 : new Date().getMinutes() - date.getMinutes();
           this.result = minutesFromTargetYear + minutesFromTargetMonth + minutesFromTargetDay + minutesFromTargetHours + minutesFromTargetMinute;
         default:
-          return this;
+          console.error("'type' is not valid")
           break;
       }
       return this;
     } else {
-      console.error("Timerange.dateFrom() only takes date objects that are in the past.")
+      console.error("Timerange.timeFrom() only takes date objects that are in the past.")
     }
+  } else {
+    console.error("Timerange.timeFrom() takes a date object as an argument eg. new Date()")
   }
 }
 
 Timerange.prototype.display = function(){
   var parent = document.getElementById("timerange")
-  var isH1 = document.getElementsByTagName("h1")[0];
+  var isTime = document.getElementsByClassName("time")[0];
   var node = document.createElement("h1")
   var textContent = this.result || "Hello World!";
   node.textContent = textContent;
-  if(isH1){
-    parent.removeChild(isH1);
+  if(isTime){
+    parent.removeChild(isTime);
     parent.appendChild(node);
   } else {
     parent.appendChild(node)
