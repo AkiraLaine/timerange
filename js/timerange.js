@@ -46,6 +46,7 @@ Timerange.prototype.display = function(){
   var parent = document.getElementById("timerange")
   var isTime = document.getElementsByClassName("time")[0];
   var node = document.createElement("h1")
+  node.classList.add("time")
   var textContent = this.result || "Hello World!";
   node.textContent = textContent;
   if(isTime){
