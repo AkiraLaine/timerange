@@ -14,38 +14,35 @@ Timerange.prototype = (function(){
     var targetMonth = date.getMonth() === new Date().getMonth() ? 0 : (new Date().getMonth() - date.getMonth()) * 31 * increment;
     var targetDay = date.getDate() === new Date().getDate() ? 0 : (new Date().getDate() - date.getDate()) * increment;
     if(format === "hours"){
-      var targetHour = date.getHours() === new Date().getHours() ? 0 : new Date().getHours() - date.getHours()
+      var targetHour = date.getHours() > new Date().getHours() ? date.getHours() - new Date().getHours() : new Date().getHours() - date.getHours()
     }
     if(format === "minutes"){
       var targetHours = date.getHours() === new Date().getHours() ? 0 : (new Date().getHours() - date.getHours()) * increment;
       var targetMinute = date.getMinutes() === new Date().getMinutes() ? 0 : new Date().getMinutes() - date.getMinutes();
     }
+    console.log(targetYear, targetMonth, targetDay, (targetHour || 0), (targetMinute || 0))
     return targetYear + targetMonth + targetDay + (targetHour || 0) + (targetMinute || 0);
   }
 
   function timeFrom(date, type){
     if(date instanceof Date){
-      if(date.getDate() <= new Date().getDate() && date.getHours() <= new Date().getHours() && date.getMinutes() <= new Date().getMinutes()){
-        switch (type) {
-          case "days":
-            var dayInMS = 1000 * 60 * 60 * 24;
-            var differenceMs = Math.abs(Date.now() - Date.parse(date));
-            this.result = Math.round(differenceMs / dayInMS) - 1;
-            break;
-          case "hours":
-            this.result = _checkTimeFrom(date, "hours")
-            break;
-          case "minutes":
-            this.result = _checkTimeFrom(date, "minutes")
-            break;
-          default:
-            console.error("'type' is not valid")
-            break;
-        }
-        return this;
-      } else {
-        console.error("Timerange.timeFrom() only takes date objects that are in the past.")
+      switch (type) {
+        case "days":
+          var dayInMS = 1000 * 60 * 60 * 24;
+          var differenceMs = Math.abs(Date.now() - Date.parse(date));
+          this.result = Math.round(differenceMs / dayInMS) - 1;
+          break;
+        case "hours":
+          this.result = _checkTimeFrom(date, "hours")
+          break;
+        case "minutes":
+          this.result = _checkTimeFrom(date, "minutes")
+          break;
+        default:
+          console.error("'type' is not valid")
+          break;
       }
+      return this;
     } else {
       console.error("Timerange.timeFrom() takes a date object as an argument eg. new Date()")
     }
