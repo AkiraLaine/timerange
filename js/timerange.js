@@ -4,9 +4,7 @@
   Created On: 27/04/2016
 */
 
-var Timerange = new Function();
-
-Timerange.prototype = (function(){
+Timerange = (function(){
 
   function _checkTimeFrom(date,format){
     var increment = format === "hours" ? 24 : 24 * 60;
@@ -79,4 +77,5 @@ Timerange.prototype = (function(){
     timeFrom: timeFrom,
     display: display
   }
+  
 })();
