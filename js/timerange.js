@@ -8,31 +8,60 @@ var Timerange = new Function();
 
 Timerange.prototype = (function(){
 
-  function _checkTimeFrom(date,format){
-    var increment = format === "hours" ? 24 : 24 * 60;
-    var targetYear = date.getYear() === new Date().getYear() ? 0 : 365 * increment;
-    var targetMonth = date.getMonth() === new Date().getMonth() ? 0 : (new Date().getMonth() - date.getMonth()) * 31 * increment;
-    var targetDay = date.getDate() === new Date().getDate() ? 0 : (new Date().getDate() - date.getDate()) * increment;
-    if(format === "hours"){
-      if(date.getHours() > new Date().getHours()){
-        targetDay -= (date.getHours() - new Date().getHours());
+  function _checkTime(date,format,direction){
+    if(direction === "from"){
+      var increment = format === "hours" ? 24 : 24 * 60;
+      var targetYear = date.getYear() === new Date().getYear() ? 0 : 365 * increment;
+      var targetMonth = date.getMonth() === new Date().getMonth() ? 0 : (new Date().getMonth() - date.getMonth()) * 31 * increment;
+      var targetDay = date.getDate() === new Date().getDate() ? 0 : (new Date().getDate() - date.getDate()) * increment;
+      if(format === "hours"){
+        if(date.getHours() > new Date().getHours()){
+          targetDay -= (date.getHours() - new Date().getHours());
+        } else {
+          var targetHour = new Date().getHours() - date.getHours();
+        }
+      }
+      if(format === "minutes"){
+        if(date.getHours() > new Date().getHours()){
+          targetDay -= (date.getHours() - new Date().getHours()) * 60;
+        } else {
+          var targetHour = (new Date().getHours() - date.getHours()) * 60
+        }
+        var targetMinute = date.getMinutes() > new Date().getMinutes() ? -(date.getMinutes() - new Date().getMinutes()) : (new Date().getMinutes() - date.getMinutes());
+      }
+      console.log(targetYear, targetMonth, targetDay, (targetHour || 0), (targetMinute || 0))
+      if(targetYear + targetMonth + targetDay + (targetHour || 0) + (targetMinute || 0) >= 0){
+        return result = targetYear + targetMonth + targetDay + (targetHour || 0) + (targetMinute || 0)
       } else {
-        var targetHour = new Date().getHours() - date.getHours();
+        return "Date not in the past."
       }
     }
-    if(format === "minutes"){
-      if(date.getHours() > new Date().getHours()){
-        targetDay -= (date.getHours() - new Date().getHours()) * 60;
-      } else {
-        var targetHour = (new Date().getHours() - date.getHours()) * 60
+    else if(direction === "to"){
+      var increment = format === "hours" ? 24 : 24 * 60;
+      var targetYear = date.getYear() === new Date().getYear() ? 0 : 365 * increment;
+      var targetMonth = date.getMonth() === new Date().getMonth() ? 0 : (date.getMonth() - new Date().getMonth()) * 31 * increment;
+      var targetDay = date.getDate() === new Date().getDate() ? 0 : (date.getDate() - new Date().getDate()) * increment;
+      if(format === "hours"){
+        if(date.getHours() > new Date().getHours()){
+          targetDay += (date.getHours() - new Date().getHours());
+        } else {
+          var targetHour = date.getHours() - new Date().getHours();
+        }
       }
-      var targetMinute = date.getMinutes() > new Date().getMinutes() ? -(date.getMinutes() - new Date().getMinutes()) : (new Date().getMinutes() - date.getMinutes());
-    }
-    console.log(targetYear, targetMonth, targetDay, (targetHour || 0), (targetMinute || 0))
-    if(targetYear + targetMonth + targetDay + (targetHour || 0) + (targetMinute || 0) >= 0){
-      return result = targetYear + targetMonth + targetDay + (targetHour || 0) + (targetMinute || 0)
-    } else {
-      return "Date not in the past."
+      if(format === "minutes"){
+        if(date.getHours() > new Date().getHours()){
+          targetDay += (date.getHours() - new Date().getHours()) * 60;
+        } else {
+          var targetHour = (date.getHours() - new Date().getHours()) * 60
+        }
+        var targetMinute = date.getMinutes() > new Date().getMinutes() ? (date.getMinutes() - new Date().getMinutes()) : -(new Date().getMinutes() - date.getMinutes());
+      }
+      console.log(targetYear, targetMonth, targetDay, (targetHour || 0), (targetMinute || 0))
+      if(targetYear + targetMonth + targetDay + (targetHour || 0) + (targetMinute || 0) >= 0){
+        return result = targetYear + targetMonth + targetDay + (targetHour || 0) + (targetMinute || 0)
+      } else {
+        return "Date not in the future."
+      }
     }
   }
 
@@ -45,10 +74,34 @@ Timerange.prototype = (function(){
           this.result = Math.round(differenceMs / dayInMS) - 1;
           break;
         case "hours":
-          this.result = _checkTimeFrom(date, "hours")
+          this.result = _checkTime(date, "hours", "from")
           break;
         case "minutes":
-          this.result = _checkTimeFrom(date, "minutes")
+          this.result = _checkTime(date, "minutes", "from")
+          break;
+        default:
+          console.error("'type' is not valid")
+          break;
+      }
+      return this;
+    } else {
+      console.error("Timerange.timeFrom() takes a date object as an argument eg. new Date()")
+    }
+  }
+
+  function timeTo(date,type){
+    if(date instanceof Date){
+      switch (type) {
+        case "days":
+          var dayInMS = 1000 * 60 * 60 * 24;
+          var differenceMs = Math.abs(Date.parse(date) - Date.now());
+          this.result = Math.round(differenceMs / dayInMS) + 1;
+          break;
+        case "hours":
+          this.result = _checkTime(date, "hours", "to")
+          break;
+        case "minutes":
+          this.result = _checkTime(date, "minutes", "to")
           break;
         default:
           console.error("'type' is not valid")
@@ -77,6 +130,7 @@ Timerange.prototype = (function(){
 
   return {
     timeFrom: timeFrom,
+    timeTo: timeTo,
     display: display
   }
 })();
